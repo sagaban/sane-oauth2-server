@@ -1,34 +1,38 @@
 /**
- * User.js
+ * User
  *
- * @description :: TODO: You might write a short summary of how this model works and what it represents here.
- * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
+ * @module      :: Model
+ * @description :: A short summary of how this model works and what it represents.
+ * @docs		:: http://sailsjs.org/#!documentation/models
  */
 
-//TODO: Avoid creating the a new user with the same email
+var bcrypt = require('bcrypt');
 
 module.exports = {
 
   attributes: {
-    email: {
-      type: 'string',
-      required: true
-    },
-    password: {
-      type: 'string',
-      required: true
-    }
+        email: {
+            type: 'string',
+            required: true
+        },
+        hashedPassword: {
+            type: 'string',
+        },
+        // Override toJSON method to remove password from API
+        toJSON: function() {
+          var obj = this.toObject();
+          delete obj.password;
+          return obj;
+        }
+  },
 
-    // // e.g., "cm"
-    // wingspanUnits: {
-    //   type: 'string',
-    //   enum: ['cm', 'in', 'm', 'mm'],
-    //   defaultsTo: 'cm'
-    // },
-    //
-    // // e.g., [{...}, {...}, ...]
-    // knownDialects: {
-    //   collection: 'Dialect'
-    // }
+  beforeCreate: function(values, next){
+    bcrypt.hash(values.password, 10, function(err, hash) {
+      if(err) return next(err);
+      values.hashedPassword = hash;
+      delete values.password;
+      next();
+    });
   }
+
 };
