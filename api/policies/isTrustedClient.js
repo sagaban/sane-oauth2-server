@@ -1,12 +1,12 @@
 /**
- * isTrustedClient policy
- *
- * @module      :: Policy
- * @description :: Simple policy to allow any authenticated user
- *                 Assumes that your login action in one of your controllers sets `req.session.authenticated = true;`
- * @docs        :: http://sailsjs.org/#!documentation/policies
- *
- */
+* isTrustedClient policy
+*
+* @module      :: Policy
+* @description :: Simple policy to allow any authenticated user
+*                 Assumes that your login action in one of your controllers sets `req.session.authenticated = true;`
+* @docs        :: http://sailsjs.org/#!documentation/policies
+*
+*/
 
 module.exports = function(req, res, next) {
 
@@ -26,9 +26,9 @@ module.exports = function(req, res, next) {
           if(err){
             return res.send(500, err.message);
           } else {
-	    if(!client){
-	      return res.send(404, "Client with client id "+ clientId + " not found");
-	    }
+            if(!client){
+              return res.send(404, "Client with client id "+ clientId + " not found");
+            }
             if(client.trusted){
               return next();
             } else {

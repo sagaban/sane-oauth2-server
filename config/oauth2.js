@@ -96,6 +96,7 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
 
 // Exchange username & password for access token.
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
+  console.log('Exchange username & password for access token')
     User.findOne({ email: username }, function(err, user) {
         if (err) {
           console.error("Error getting user: ", err);
@@ -105,7 +106,8 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
           console.error("User does not exist:");
           return done(null, false);
         }
-
+        console.log('password: ', password);
+        console.log('user.hashedPassword: ', user.hashedPassword);
         var pwdCompare = bcrypt.compareSync(password, user.hashedPassword);
         if(!pwdCompare){ return done( null, false); };
 
@@ -126,7 +128,9 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
                         if(err) {
                           return done(err);
                         } else {
-                          done(null, accessToken.token, refreshToken.token, { 'expires_in': sails.config.oauth.tokenLife });
+                          done(null, accessToken.token, refreshToken.token,
+                            { 'expires_in': sails.config.oauth.tokenLife,
+                              'account_id': user.id});
                         }
                       });
                     }
@@ -246,6 +250,7 @@ module.exports = {
         server.token(),
         // server.errorHandler()
         function (err, req, res, next) {
+          console.log("Checking errors");
           if (req.xhr) {
             res.status(500).send({ error: 'Something failed!' });
           } else {
